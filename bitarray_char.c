@@ -34,11 +34,12 @@ BitArr *make_bit_arr(int size)
     BitArr *bit_arr = (BitArr *) calloc(1, sizeof(BitArr));
     bit_arr->size = size;
 
-	/* add one int to hold the partial bits if needed */
-	bit_arr->numBytes = (size * sizeof(char));
+	/* add one char to hold the partial bits if needed */
+	bit_arr->numBytes = ((size / sizeof(char)) + (size % sizeof(char) !=0 ? sizeof(char) : 0));
 
 	bit_arr->data = (char *) malloc(bit_arr->numBytes);					
-	
+    clear_bit_arr(bit_arr);
+
     return bit_arr;
 }
 
@@ -81,15 +82,26 @@ void fill_bit_arr(BitArr *bit_arr)
 	reset_bit_arr(bit_arr, ~0);
 }
 
+/* 
+ * Returns a copy of the passed bit_arr.
+ */
+BitArr *copy_bit_arr(BitArr *bit_arr)
+{
+    BitArr *copy = make_bit_arr(bit_arr->size);
+
+    return copy;
+}
+
 /*
- * Converts a bit array to a string either from left to right or right to left depending on the input direction
+ * Converts a bit array to a human readable string either from left to right
+ * or right to left depending on the input direction.
  */
 char *bit_to_string(BitArr *bit_arr, int left_right)
 {
     int size = bit_arr->size;
     int bit = 0;
 
-    char *bit_str = (char *) malloc(bit_arr->size + 1);	
+    char *bit_str =  malloc((bit_arr->size * sizeof(char)) + 1);	
 
     if (bit_str != NULL)
     {
@@ -105,8 +117,8 @@ char *bit_to_string(BitArr *bit_arr, int left_right)
 	    {
 	        for (int pos = 0; pos < size; pos++)
 			{
-				    bit = get_bit(bit_arr, pos);
-			    	bit_str[size - pos - 1] = (bit > 0 ? '1':'0');
+				bit = get_bit(bit_arr, pos);
+			    bit_str[size - pos - 1] = (bit > 0 ? '1':'0');
 		    }
 	    }
         bit_str[size] = '\0';	
@@ -118,11 +130,11 @@ char *bit_to_string(BitArr *bit_arr, int left_right)
 
 /* 
  * Prints the given bit array in format <0>* <1>* with an appended
- * '\n' character.
+ * '\n' character and given direction.
  */
 void print_bit_arr(BitArr *bit_arr, int direction)
 {
-    char *bit_str = bit_to_string(bit_arr, direction ); /* print the string using the right to left option */
+    char *bit_str = bit_to_string(bit_arr, direction );
     printf("%s\n", bit_str);
 
     free(bit_str);
