@@ -29,6 +29,22 @@ void test_fill_bit_arr(BitArr *bit_arr)
     printf("Bit array filled with 1s\n");
 }
 
+void test_copy_bit_arr(BitArr *bit_arr)
+{
+    BitArr *copy = copy_bit_arr(bit_arr);
+    char *copy_str = bit_to_string(copy, 0);
+
+    printf("Copied bit array is: %s\n", copy_str);
+
+    free_bit_arr(copy);
+    free(copy_str);
+}
+
+void test_is_empty_bit_arr(BitArr *bit_arr)
+{
+    printf("Test is empty bit array: %d\n", is_empty_bit_arr(bit_arr));
+}
+
 void test_free_bit_arr()
 {
     free_bit_arr(bit_arr);
@@ -40,8 +56,6 @@ void test_print_bit_arr(BitArr *bit_arr, int direction)
     printf("Printed bit string (R-L): ");
     print_bit_arr(bit_arr, direction);
 }
-
-
 
 int main()
 {
@@ -64,6 +78,9 @@ int main()
     test_set_bit(1, 1);
     test_print_bit_arr(bit_arr, 0);
     test_print_bit_arr(bit_arr, 1);
+    test_copy_bit_arr(bit_arr);
+    test_clear_bit_arr(bit_arr);
+    test_is_empty_bit_arr(bit_arr);
 
     test_get_bit(5);
     test_get_bit(1);

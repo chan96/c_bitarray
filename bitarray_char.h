@@ -8,7 +8,7 @@ typedef struct bitarr
 {
     char *data;
     int size;			/* number of bits */
-	int numBytes;		/* number of bytes required for the array */
+	int num_bytes;		/* number of bytes required for the array */
 
 } BitArr;
 
@@ -36,6 +36,16 @@ void clear_bit_arr(BitArr *bit_arr);
  * Sets the bits of the bit array to all 1s
  */
 void fill_bit_arr(BitArr *bit_arr);
+
+/* 
+ * Returns a copy of the passed bit_arr.
+ */
+BitArr *copy_bit_arr(BitArr *bit_arr);
+
+/* 
+ * Returns 0 if the bit array is empty, else a non-negative number.
+ */
+int is_empty_bit_arr(BitArr *bit_arr);
 
 /* 
  * Converts the bit array to a string representation of <0>* <1>*

@@ -15,7 +15,7 @@ reset the entire bit_arr with the input value 0 or 1
 */
 void reset_bit_arr(BitArr *bit_arr, int value)
 {
-	memset(bit_arr->data, value, bit_arr->numBytes);
+	memset(bit_arr->data, value, bit_arr->num_bytes);
 }
 
 /*
@@ -35,9 +35,9 @@ BitArr *make_bit_arr(int size)
     bit_arr->size = size;
 
 	/* add one char to hold the partial bits if needed */
-	bit_arr->numBytes = ((size / sizeof(char)) + (size % sizeof(char) !=0 ? sizeof(char) : 0));
+	bit_arr->num_bytes = ((size >> 3) + ((size & MASK) !=0 ? 1 : 0));
 
-	bit_arr->data = (char *) malloc(bit_arr->numBytes);					
+	bit_arr->data = (char *) malloc(bit_arr->num_bytes);					
     clear_bit_arr(bit_arr);
 
     return bit_arr;
@@ -87,9 +87,20 @@ void fill_bit_arr(BitArr *bit_arr)
  */
 BitArr *copy_bit_arr(BitArr *bit_arr)
 {
-    BitArr *copy = make_bit_arr(bit_arr->size);
+    int num_bits = bit_arr->size;
+
+    BitArr *copy = make_bit_arr(num_bits);
+    memcpy(copy->data, bit_arr->data, bit_arr->num_bytes);
 
     return copy;
+}
+
+/* 
+ * Returns 0 if the bit array is empty, else a non-zero number.
+ */
+int is_empty_bit_arr(BitArr *bit_arr)
+{
+    return !(*bit_arr->data & (~0));
 }
 
 /*
@@ -126,7 +137,6 @@ char *bit_to_string(BitArr *bit_arr, int left_right)
 
    return bit_str;
 }
-
 
 /* 
  * Prints the given bit array in format <0>* <1>* with an appended
