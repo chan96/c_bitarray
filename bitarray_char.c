@@ -27,21 +27,17 @@ void clear_bit_arr(BitArr *bit_arr)
 }
 
 /* 
- * Initializes and returns a BitArr with number of bits = size * sizeof(int).
+ * Initializes and returns a BitArr with number of bits = size * sizeof(char).
  */
 BitArr *make_bit_arr(int size)
 {
-    int size_div8 = size >> 3;		/* 8 bits per 1 byte */
-	int size_mod8 = size & MASK;
-
     BitArr *bit_arr = (BitArr *) calloc(1, sizeof(BitArr));
     bit_arr->size = size;
 
 	/* add one int to hold the partial bits if needed */
-	bit_arr->numBytes = (size_div8 * sizeof(char))  + (size_mod8 != 0 ?  sizeof(char) : 0);
+	bit_arr->numBytes = (size * sizeof(char));
 
 	bit_arr->data = (char *) malloc(bit_arr->numBytes);					
-	clear_bit_arr(bit_arr);
 	
     return bit_arr;
 }
@@ -51,7 +47,10 @@ BitArr *make_bit_arr(int size)
  */
 int get_bit(BitArr *bit_arr, int offset)
 {
-    return (bit_arr->data[offset / 8 ] & (1 << (offset % 8))) != 0 ? 1 : 0;
+    int arr_index = offset >> 3;
+    int bit_index = offset & MASK;
+
+    return (bit_arr->data[arr_index] & (1 << bit_index)) != 0 ? 1 : 0;
 }
 
 /* 
@@ -83,36 +82,35 @@ void fill_bit_arr(BitArr *bit_arr)
 }
 
 /*
-converts a bit array to a string either from left to right or right to left depending on the input direction
-*/
+ * Converts a bit array to a string either from left to right or right to left depending on the input direction
+ */
 char *bit_to_string(BitArr *bit_arr, int left_right)
 {
-   int size = bit_arr->size;
-   int bit = 0;
-   int j;
+    int size = bit_arr->size;
+    int bit = 0;
 
-   char *bit_str = (char *) malloc(bit_arr->size + 1);	
+    char *bit_str = (char *) malloc(bit_arr->size + 1);	
 
-   if (bit_str != NULL)
-   {
-	   if (left_right)
-	   {
-		   for (j=0; j<size; j++)
+    if (bit_str != NULL)
+    {
+	    if (left_right)
+	    {
+		    for (int pos = 0; pos < size; pos++)
 			{
-				bit = get_bit(bit_arr, j);
-				*(bit_str + j) = (bit > 0 ? '1':'0');
-			}
-	   }
-	   else  /* from right to left */
-	   {
-		   for (j=0; j<size; j++)
+				bit = get_bit(bit_arr, pos);
+				bit_str[pos] = (bit > 0 ? '1':'0');
+		    }
+	    }
+	    else  /* from right to left */
+	    {
+	        for (int pos = 0; pos < size; pos++)
 			{
-				bit = get_bit(bit_arr, j);
-				*(bit_str + (size - j - 1)) = (bit > 0 ? '1':'0');
-			}
-	   }
-   *(bit_str + size) = '\0';	
-   }
+				    bit = get_bit(bit_arr, pos);
+			    	bit_str[size - pos - 1] = (bit > 0 ? '1':'0');
+		    }
+	    }
+        bit_str[size] = '\0';	
+    }    
 
    return bit_str;
 }
@@ -135,7 +133,6 @@ void print_bit_arr(BitArr *bit_arr, int direction)
  */
 void free_bit_arr(BitArr *bit_arr)
 {
-
     free(bit_arr->data);
     free(bit_arr);
 }
