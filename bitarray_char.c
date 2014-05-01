@@ -103,6 +103,17 @@ int is_empty_bit_arr(BitArr *bit_arr)
     return !(*bit_arr->data & (~0));
 }
 
+/* 
+ * Flips the current state of the bit at offset (0 or 1).
+ */
+void flip_bit(BitArr *bit_arr, int offset)
+{
+    int arr_index = offset >> 3;
+    int bit_index = offset & MASK;
+
+    bit_arr->data[arr_index] ^= 1 << bit_index;
+}
+
 /*
  * Converts a bit array to a human readable string either from left to right
  * or right to left depending on the input direction.

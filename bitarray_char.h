@@ -48,6 +48,11 @@ BitArr *copy_bit_arr(BitArr *bit_arr);
 int is_empty_bit_arr(BitArr *bit_arr);
 
 /* 
+ * Flips the current state of the bit at offset (0 or 1).
+ */
+void flip_bit(BitArr *bit_arr, int offset);
+
+/* 
  * Converts the bit array to a string representation of <0>* <1>*
  */
 char *bit_to_string(BitArr *bit_arr, int left_right);

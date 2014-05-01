@@ -45,6 +45,14 @@ void test_is_empty_bit_arr(BitArr *bit_arr)
     printf("Test is empty bit array: %d\n", is_empty_bit_arr(bit_arr));
 }
 
+void test_flip_bit(BitArr *bit_arr, int offset)
+{
+    print_bit_arr(bit_arr, 0);
+    flip_bit(bit_arr, offset);
+    printf("Flipped bit at offset %d\n", offset);
+    print_bit_arr(bit_arr, 0);
+}
+
 void test_free_bit_arr()
 {
     free_bit_arr(bit_arr);
@@ -76,8 +84,8 @@ int main()
 
     test_set_bit(5, 1);
     test_set_bit(1, 1);
+    test_flip_bit(bit_arr, 5);
     test_print_bit_arr(bit_arr, 0);
-    test_print_bit_arr(bit_arr, 1);
     test_copy_bit_arr(bit_arr);
     test_clear_bit_arr(bit_arr);
     test_is_empty_bit_arr(bit_arr);
