@@ -48,10 +48,7 @@ BitArr *make_bit_arr(int size)
  */
 int get_bit(BitArr *bit_arr, int offset)
 {
-    int arr_index = offset >> 3;
-    int bit_index = offset & MASK;
-
-    return (bit_arr->data[arr_index] & (1 << bit_index)) != 0 ? 1 : 0;
+    return (bit_arr->data[offset >> 3] & (1 << (offset & MASK)));
 }
 
 /* 
@@ -59,18 +56,18 @@ int get_bit(BitArr *bit_arr, int offset)
  */
 void set_bit(BitArr *bit_arr, int offset, int val)
 {
-	int arr_index = offset >> 3;	 /* index to the closest byte */
-    int bit_index = offset & MASK;
+	//note that arr index = offset >> 3 and is index to the closest byte.
+    //note that  bit index = offset & MASK;
 
 	if (val)	
     {
         /*  use bitwise OR on bitmask with all zeros except 1 in the desired position */	
-		bit_arr->data[arr_index] |= (1 << bit_index);		    
+		bit_arr->data[offset >> 3] |= (1 << (offset & MASK));		    
     }
 	else				
     {
 	    /* otherwise set the bit to zero */
-    	bit_arr->data[arr_index] &= (~ (1 << bit_index));	
+    	bit_arr->data[offset >> 3] &= (~ (1 << (offset & MASK)));	
     }
 }
 
@@ -108,10 +105,18 @@ int is_empty_bit_arr(BitArr *bit_arr)
  */
 void flip_bit(BitArr *bit_arr, int offset)
 {
-    int arr_index = offset >> 3;
-    int bit_index = offset & MASK;
+    //int arr_index = offset >> 3;
+    //int bit_index = offset & MASK;
 
-    bit_arr->data[arr_index] ^= 1 << bit_index;
+    bit_arr->data[offset >> 3] ^= 1 << (offset & MASK);
+}
+
+/* 
+ * Returns the length of the bit array in bits.
+ */
+int get_bit_len(BitArr *bit_arr)
+{
+    return bit_arr->size;
 }
 
 /*

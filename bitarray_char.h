@@ -53,6 +53,11 @@ int is_empty_bit_arr(BitArr *bit_arr);
 void flip_bit(BitArr *bit_arr, int offset);
 
 /* 
+ * Returns the length of the bit array in bits.
+ */
+int get_bit_len(BitArr *bit_arr);
+    
+/* 
  * Converts the bit array to a string representation of <0>* <1>*
  */
 char *bit_to_string(BitArr *bit_arr, int left_right);

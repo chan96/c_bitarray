@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "bitarray_int.h"
+
 #define MASK 0x1f
 
 /*
@@ -14,7 +15,7 @@ reset the entire bit_arr with the input value 0 or 1
 */
 void reset_bit_arr(BitArr *bit_arr, int value)
 {
-	memset(bit_arr->data, value, bit_arr->numBytes);
+	memset(bit_arr->data, value, bit_arr->num_bytes);
 }
 
 /*
@@ -30,18 +31,15 @@ void clear_bit_arr(BitArr *bit_arr)
  */
 BitArr *make_bit_arr(int size)
 {
-	int sizeDiv32 = size >> 5;		/* 32 bits per 4 byte int */
-	int sizeMod32 = size & MASK;
-
     BitArr *bit_arr = (BitArr *) calloc(1, sizeof(BitArr));
     bit_arr->size = size;
 
 	/* add one int to hold the partial bits if needed */
-	bit_arr->numBytes = (sizeDiv32 * sizeof(int))  + (sizeMod32 != 0 ?  sizeof(int) : 0);
+	bit_arr->num_bytes = (((size >> 5) * 4) + ((size & MASK) !=0 ? 4 : 0));
 
-	bit_arr->data = (int *) malloc(bit_arr->numBytes);					
-	clear_bit_arr(bit_arr);
-	
+	bit_arr->data = (int *) malloc(bit_arr->num_bytes);					
+    clear_bit_arr(bit_arr);
+
     return bit_arr;
 }
 
@@ -50,11 +48,10 @@ BitArr *make_bit_arr(int size)
  */
 int get_bit(BitArr *bit_arr, int offset)
 {
-	/*
-    return (bit_arr->data[offset >> 5] & (1 << (offset & MASK))) != 0 ? 1 : 0;
-	*/
-	return (bit_arr->data[offset / 32 ] & (1 << (offset % 32))) != 0 ? 1 : 0;
+    int arr_index = offset >> 5;
+    int bit_index = offset & MASK;
 
+    return (bit_arr->data[arr_index] & (1 << bit_index)) != 0 ? 1 : 0;
 }
 
 /* 
@@ -62,13 +59,19 @@ int get_bit(BitArr *bit_arr, int offset)
  */
 void set_bit(BitArr *bit_arr, int offset, int val)
 {
-    int arr_index = offset >> 5;
-/*    int arr_bit_pos = offset & MASK;
-*/
-	int arr_bit_pos = offset % 32;
+	int arr_index = offset >> 5;	 /* index to the closest byte */
+    int bit_index = offset & MASK;
 
-    if (val) { bit_arr->data[arr_index] |= (1 << arr_bit_pos); }
-    else { bit_arr->data[arr_index] &= ~(1 << arr_bit_pos); }
+	if (val)	
+    {
+        /*  use bitwise OR on bitmask with all zeros except 1 in the desired position */	
+		bit_arr->data[arr_index] |= (1 << bit_index);		    
+    }
+	else				
+    {
+	    /* otherwise set the bit to zero */
+    	bit_arr->data[arr_index] &= (~ (1 << bit_index));	
+    }
 }
 
 /*
@@ -79,58 +82,82 @@ void fill_bit_arr(BitArr *bit_arr)
 	reset_bit_arr(bit_arr, ~0);
 }
 
+/* 
+ * Returns a copy of the passed bit_arr.
+ */
+BitArr *copy_bit_arr(BitArr *bit_arr)
+{
+    int num_bits = bit_arr->size;
+
+    BitArr *copy = make_bit_arr(num_bits);
+    memcpy(copy->data, bit_arr->data, bit_arr->num_bytes);
+
+    return copy;
+}
+
+/* 
+ * Returns 0 if the bit array is empty, else a non-zero number.
+ */
+int is_empty_bit_arr(BitArr *bit_arr)
+{
+    return !(*bit_arr->data & (~0));
+}
+
+/* 
+ * Flips the current state of the bit at offset (0 or 1).
+ */
+void flip_bit(BitArr *bit_arr, int offset)
+{
+    int arr_index = offset >> 5;
+    int bit_index = offset & MASK;
+
+    bit_arr->data[arr_index] ^= 1 << bit_index;
+}
+
 /*
-converts a bit array to a string either from left to right or right to left depending on the input direction
-*/
+ * Converts a bit array to a human readable string either from left to right
+ * or right to left depending on the input direction.
+ */
 char *bit_to_string(BitArr *bit_arr, int left_right)
 {
-   int size = bit_arr->size;
-   int bit = 0;
-   int j;
+    int size = bit_arr->size;
+    int bit = 0;
 
-   char *bit_str = (char *) malloc(bit_arr->size + 1);	
+    char *bit_str =  malloc((bit_arr->size * sizeof(char)) + 1);	
 
-   if (bit_str != NULL)
-   {
-	   if (left_right)
-	   {
-		   for (j=0; j<size; j++)
+    if (bit_str != NULL)
+    {
+	    if (left_right)
+	    {
+		    for (int pos = 0; pos < size; pos++)
 			{
-				bit = get_bit(bit_arr, j);
-				*(bit_str + j) = (bit > 0 ? '1':'0');
-			}
-	   }
-	   else  /* from right to left */
-	   {
-		   for (j=0; j<size; j++)
+				bit = get_bit(bit_arr, pos);
+				bit_str[pos] = (bit > 0 ? '1':'0');
+		    }
+	    }
+	    else  /* from right to left */
+	    {
+	        for (int pos = 0; pos < size; pos++)
 			{
-				bit = get_bit(bit_arr, j);
-				*(bit_str + (size - j - 1)) = (bit > 0 ? '1':'0');
-			}
-	   }
-   *(bit_str + size) = '\0';	
-   }
+				bit = get_bit(bit_arr, pos);
+			    bit_str[size - pos - 1] = (bit > 0 ? '1':'0');
+		    }
+	    }
+        bit_str[size] = '\0';	
+    }    
 
    return bit_str;
 }
 
 /* 
  * Prints the given bit array in format <0>* <1>* with an appended
- * '\n' character.
+ * '\n' character and given direction.
  */
-void print_bit_arr(BitArr *bit_arr)
+void print_bit_arr(BitArr *bit_arr, int direction)
 {
-    char *bit_str = bit_to_string(bit_arr, 0 ); /* print the string using the right to left option */
-    //printf("%s\n", bit_str);
+    char *bit_str = bit_to_string(bit_arr, direction );
+    printf("%s\n", bit_str);
 
-    free(bit_str);
-}
-
-void print_reverse_bit_arr(BitArr *bit_arr)
-{
-    char *bit_str = bit_to_string(bit_arr, 1); /* print the string using the left to right option */
-    //printf("%s\n", bit_str);
-	
     free(bit_str);
 }
 
@@ -139,7 +166,6 @@ void print_reverse_bit_arr(BitArr *bit_arr)
  */
 void free_bit_arr(BitArr *bit_arr)
 {
-
     free(bit_arr->data);
     free(bit_arr);
 }

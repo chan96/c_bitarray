@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "bitarray_char.h"
+#include "bitarray_int.h"
 
 BitArr *bit_arr;
 
