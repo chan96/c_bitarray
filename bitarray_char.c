@@ -14,8 +14,8 @@
  */
 
 /*
-reset the entire bit_arr with the input value 0 or 1
-*/
+ * Reset the entire bit_arr with the input value 0 or 1.
+ */
 void reset_bit_arr(BitArr *bit_arr, int value)
 {
 	memset(bit_arr->data, value, bit_arr->num_bytes);
@@ -47,7 +47,7 @@ BitArr *make_bit_arr(int size)
 }
 
 /* 
- * Returns the bit value at the given offset of bit_arr, 0 or 1.
+ * Returns a non-zero number if the bit is set.
  */
 int get_bit(BitArr *bit_arr, int offset)
 {
@@ -125,7 +125,7 @@ int get_bit_len(BitArr *bit_arr)
 
 /*
  * Converts a bit array to a human readable string either from left to right
- * or right to left depending on the input direction.
+ * or right to left depending on the input direction. (1 is L-R, 0 is R-L).
  */
 char *bit_to_string(BitArr *bit_arr, int left_right)
 {
@@ -160,7 +160,7 @@ char *bit_to_string(BitArr *bit_arr, int left_right)
 
 /* 
  * Prints the given bit array in format <0>* <1>* with an appended
- * '\n' character and given direction.
+ * '\n' character and given direction (1 is L-R, 0 is R-L).
  */
 void print_bit_arr(BitArr *bit_arr, int direction)
 {

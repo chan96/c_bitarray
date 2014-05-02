@@ -13,6 +13,11 @@ typedef struct bitarr
 
 } BitArr;
 
+/*
+ * Reset the entire bit_arr with the input value 0 or 1.
+ */
+void reset_bit_arr(BitArr *bit_arr, int value);
+
 /* 
  * Initializes and returns a BitArr with number of bits = size * sizeof(int)
  */
