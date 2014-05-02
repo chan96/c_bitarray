@@ -1,0 +1,15 @@
+#!/bin/bash
+# This script outputs the memory usage of the standard int array vs  
+# bit array implementaions using the benchmark. Make sure to uncomment
+# main() functions in both files first.
+
+echo "Mem use of bitarray:"
+gcc -std=gnu99 -Werror -Wall bitarray_char.c
+valgrind --leak-check=full ./a.out
+
+echo -e "\n"
+echo "Mem use of standard int array:"
+gcc -std=gnu99 -Werror -Wall std_int_arr.c
+valgrind --leak-check=full ./a.out
+
+rm ./a.out

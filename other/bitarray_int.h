@@ -6,10 +6,9 @@
 
 typedef struct bitarr
 {
-    char *data;
-    unsigned short size;			/* use unsigned short to store size (save memory and will unlikely
-                            be so big*/
-	unsigned short num_bytes;		/* use unsigned short to store  number of bytes required for the array */
+    int *data;
+    int size;			/* number of bits */
+	int num_bytes;		/* number of bytes required for the array */
 
 } BitArr;
 
@@ -53,11 +52,6 @@ int is_empty_bit_arr(BitArr *bit_arr);
  */
 void flip_bit(BitArr *bit_arr, int offset);
 
-/* 
- * Returns the length of the bit array in bits.
- */
-int get_bit_len(BitArr *bit_arr);
-    
 /* 
  * Converts the bit array to a string representation of <0>* <1>*
  */

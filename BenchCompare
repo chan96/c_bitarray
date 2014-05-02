@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script outputs the execution time of the bitarray vs using standard
+# int array. Make sure to uncomment out the main() functions in both files
+# for this to work.
+
+echo "Execution time of bitarray:"
+gcc -std=gnu99 -Werror -Wall  bitarray_char.c
+time ./a.out
+
+echo "Execution time of standard int array:"
+gcc -std=gnu99 -Werror -Wall std_int_arr.c
+time ./a.out
+rm ./a.out

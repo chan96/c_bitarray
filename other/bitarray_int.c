@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "bitarray_char.h"
+#include "bitarray_int.h"
 
-#define NUMTESTS 1000000
-#define SIZE 10
-
-#define MASK 0x07
+#define MASK 0x1f
 
 /*
  * Bitvector (ie. bitarray) library
@@ -30,17 +27,17 @@ void clear_bit_arr(BitArr *bit_arr)
 }
 
 /* 
- * Initializes and returns a BitArr with number of bits = size * sizeof(char).
+ * Initializes and returns a BitArr with number of bits = size * sizeof(int).
  */
 BitArr *make_bit_arr(int size)
 {
-    BitArr *bit_arr = calloc(1, sizeof(BitArr));
+    BitArr *bit_arr = (BitArr *) calloc(1, sizeof(BitArr));
     bit_arr->size = size;
 
-	/* add one char to hold the partial bits if needed */
-	bit_arr->num_bytes = ((size >> 3) + ((size & MASK) !=0 ? 1 : 0));
+	/* add one int to hold the partial bits if needed */
+	bit_arr->num_bytes = (((size >> 5) * 4) + ((size & MASK) !=0 ? 4 : 0));
 
-	bit_arr->data = (char *) malloc(bit_arr->num_bytes);					
+	bit_arr->data = (int *) malloc(bit_arr->num_bytes);					
     clear_bit_arr(bit_arr);
 
     return bit_arr;
@@ -51,10 +48,10 @@ BitArr *make_bit_arr(int size)
  */
 int get_bit(BitArr *bit_arr, int offset)
 {
-	//note that arr index = offset >> 3 and is index to the closest byte.
-    //note that  bit index = offset & MASK;
+    int arr_index = offset >> 5;
+    int bit_index = offset & MASK;
 
-    return (bit_arr->data[offset >> 3] & (1 << (offset & MASK)));
+    return (bit_arr->data[arr_index] & (1 << bit_index)) != 0 ? 1 : 0;
 }
 
 /* 
@@ -62,18 +59,18 @@ int get_bit(BitArr *bit_arr, int offset)
  */
 void set_bit(BitArr *bit_arr, int offset, int val)
 {
-    unsigned short arr_index = offset >> 3;
-    unsigned short offset_mask = 1 << (offset & MASK);
+	int arr_index = offset >> 5;	 /* index to the closest byte */
+    int bit_index = offset & MASK;
 
 	if (val)	
     {
         /*  use bitwise OR on bitmask with all zeros except 1 in the desired position */	
-		bit_arr->data[arr_index] |= offset_mask; 
+		bit_arr->data[arr_index] |= (1 << bit_index);		    
     }
 	else				
     {
 	    /* otherwise set the bit to zero */
-    	bit_arr->data[arr_index] &= (~ offset_mask);	
+    	bit_arr->data[arr_index] &= (~ (1 << bit_index));	
     }
 }
 
@@ -90,7 +87,9 @@ void fill_bit_arr(BitArr *bit_arr)
  */
 BitArr *copy_bit_arr(BitArr *bit_arr)
 {
-    BitArr *copy = make_bit_arr(bit_arr->size);
+    int num_bits = bit_arr->size;
+
+    BitArr *copy = make_bit_arr(num_bits);
     memcpy(copy->data, bit_arr->data, bit_arr->num_bytes);
 
     return copy;
@@ -109,18 +108,10 @@ int is_empty_bit_arr(BitArr *bit_arr)
  */
 void flip_bit(BitArr *bit_arr, int offset)
 {
-    //int arr_index = offset >> 3;
-    //int bit_index = offset & MASK;
+    int arr_index = offset >> 5;
+    int bit_index = offset & MASK;
 
-    bit_arr->data[offset >> 3] ^= 1 << (offset & MASK);
-}
-
-/* 
- * Returns the length of the bit array in bits.
- */
-int get_bit_len(BitArr *bit_arr)
-{
-    return bit_arr->size;
+    bit_arr->data[arr_index] ^= 1 << bit_index;
 }
 
 /*
@@ -132,7 +123,7 @@ char *bit_to_string(BitArr *bit_arr, int left_right)
     int size = bit_arr->size;
     int bit = 0;
 
-    char *bit_str =  malloc((size * sizeof(char)) + 1);	
+    char *bit_str =  malloc((bit_arr->size * sizeof(char)) + 1);	
 
     if (bit_str != NULL)
     {
@@ -178,23 +169,3 @@ void free_bit_arr(BitArr *bit_arr)
     free(bit_arr->data);
     free(bit_arr);
 }
-
-/*int main()
-{
-
-    for (int i = 0; i < NUMTESTS; i++)
-    {
-        BitArr *bit_arr = make_bit_arr(SIZE);
-        for (int j = 0; j < SIZE; j++)
-        {
-            set_bit(bit_arr, j, 1);
-            get_bit(bit_arr, j);
-            flip_bit(bit_arr, j);
-        }
-        fill_bit_arr(bit_arr);
-        clear_bit_arr(bit_arr);
-
-        free_bit_arr(bit_arr);
-    }
-    return 0;
-}*/

@@ -1,0 +1,21 @@
+#!/bin/bash
+# This script uses gprof to output textfiles detailing the execution
+# statistics of the bitarray library vs using a standard int array.
+# Make sure to uncomment the main() functions in both files for this to work.
+
+echo "Generating BitArrPerf.txt..."
+
+gcc -std=gnu99 -Werror -Wall -pg bitarray_char.c
+./a.out
+gprof a.out gmon.out > BitArrPerf.txt
+
+echo "Done."
+echo "Generating StdIntArrPerf.txt..."
+
+gcc -std=gnu99 -Werror -Wall -pg std_int_arr.c
+./a.out
+gprof a.out gmon.out > StdIntArrPerf.txt
+rm ./a.out
+rm ./gmon.out
+
+echo -e "Done.\nAll files made successfully. You can now use a text editor to view the performance statistics."

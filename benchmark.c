@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define NUMTESTS 10000000
-#define SIZE 5
+#define NUMTESTS 1000
+#define SIZE 1000
 
 int main()
 {
@@ -16,9 +16,9 @@ int main()
             set_bit(bit_arr, j, 1);
             get_bit(bit_arr, j);
             flip_bit(bit_arr, j);
-            fill_bit_arr(bit_arr);
-            clear_bit_arr(bit_arr);
         }
+        fill_bit_arr(bit_arr);
+        clear_bit_arr(bit_arr);
 
         free_bit_arr(bit_arr);
     }
