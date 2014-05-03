@@ -97,7 +97,7 @@ BitArr *copy_bit_arr(BitArr *bit_arr)
 }
 
 /* 
- * Returns 0 if the bit array is empty, else a non-zero number.
+ * Returns 0 if the bit array is empty, else 1.
  */
 int is_empty_bit_arr(BitArr *bit_arr)
 {
@@ -116,7 +116,7 @@ void flip_bit(BitArr *bit_arr, int offset)
 }
 
 /* 
- * Returns the length of the bit array in bits.
+ * Returns the length of the bit array in num bits.
  */
 int get_bit_len(BitArr *bit_arr)
 {

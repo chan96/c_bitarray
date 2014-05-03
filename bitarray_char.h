@@ -1,7 +1,6 @@
 /* 
  * Defines the bit array struct. "data" is the actual bit array 
- * (normally 32 bits and is the default word size), and "size" 
- * is the multiple length of the array.
+ * and based on char. size is the number of bits. 
  */
 
 typedef struct bitarr
@@ -19,12 +18,12 @@ typedef struct bitarr
 void reset_bit_arr(BitArr *bit_arr, int value);
 
 /* 
- * Initializes and returns a BitArr with number of bits = size * sizeof(int)
+ * Initializes and returns a BitArr with number of bits = size.
  */
 BitArr *make_bit_arr(int size);
 
 /* 
- * Returns the bit value at the given offset of bit_arr, 0 or positive value.
+ * Returns a non-zero number if the bit is set.
  */
 int get_bit(BitArr *bit_arr, int offset);
 
@@ -49,7 +48,7 @@ void fill_bit_arr(BitArr *bit_arr);
 BitArr *copy_bit_arr(BitArr *bit_arr);
 
 /* 
- * Returns 0 if the bit array is empty, else a non-negative number.
+ * Returns 0 if the bit array is empty, else 1
  */
 int is_empty_bit_arr(BitArr *bit_arr);
 
@@ -59,18 +58,19 @@ int is_empty_bit_arr(BitArr *bit_arr);
 void flip_bit(BitArr *bit_arr, int offset);
 
 /* 
- * Returns the length of the bit array in bits.
+ * Returns the length of the bit array in num bits.
  */
 int get_bit_len(BitArr *bit_arr);
     
 /* 
- * Converts the bit array to a string representation of <0>* <1>*
+ * Converts a bit array to a human readable string either from left to right
+ * or right to left depending on the input direction. (1 is L-R, 0 is R-L).
  */
 char *bit_to_string(BitArr *bit_arr, int left_right);
 
 /* 
  * Prints the given bit array in format <0>* <1>* with an appended
- * '\n' character. Direction of 1 to print L to R, or 0 to print R to L.
+ * '\n' character and given direction (1 is L-R, 0 is R-L).
  */
 void print_bit_arr(BitArr *bit_arr, int direction);
 
